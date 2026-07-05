@@ -670,3 +670,338 @@ chmod -R 755 directory
 
 Linux provides a powerful command-line environment for managing files, users, permissions, software packages, and system administration tasks. Understanding these fundamental commands and permission models is essential for careers in Cloud Computing, DevOps, System Administration, Cybersecurity, and Software Development.
 
+
+Linux Documentation – Processes, Daemons, Logs & File Deletion Commands
+1. Introduction
+
+Linux is a multi-user, multitasking operating system capable of running multiple programs simultaneously. Every running program becomes a process, while background services called daemons continuously provide essential system functionality. Linux also maintains logs to record system activities, errors, and events. Understanding these concepts is fundamental for Linux administration, Cloud Engineering, and DevOps.
+
+2. Process
+What is a Process?
+
+A process is a program that is currently executing.
+
+When a program stored on disk is loaded into memory and begins execution, the operating system creates a process.
+
+A process contains:
+
+Program code
+Process ID (PID)
+Memory allocation
+CPU state
+Open files
+Environment variables
+Execution state
+Real-Life Analogy
+
+Imagine a recipe book.
+
+Recipe → Program
+Chef cooking the recipe → Process
+
+The recipe itself does nothing until someone starts cooking it. Similarly, a program does nothing until the operating system executes it.
+
+3. Program vs Process
+Feature	Program	Process
+Definition	Collection of instructions	Running instance of a program
+Stored in	Disk	Main Memory (RAM)
+Nature	Passive	Active
+CPU Usage	No	Yes
+Memory Allocation	No	Yes
+Process ID (PID)	No	Yes
+Execution	Not running	Currently running
+Key Takeaway
+
+Program = Instructions stored on disk
+
+Process = Running instance of those instructions managed by the operating system
+
+4. Foreground Process
+
+A foreground process runs directly in the terminal currently being used.
+
+Characteristics:
+
+Uses the current terminal
+Takes control of the terminal
+User cannot execute another command until it finishes
+Mostly used for interactive applications
+
+Example:
+
+sleep 60
+
+Result:
+
+Terminal waits for 60 seconds.
+Prompt does not return immediately.
+5. Background Process
+
+A background process executes without occupying the terminal.
+
+Characteristics:
+
+Terminal remains available
+User can continue executing commands
+Suitable for long-running tasks and services
+
+Example:
+
+sleep 60 &
+
+Example Output
+
+[1] 2456
+
+Where
+
+[1] → Job Number
+2456 → Process ID (PID)
+
+The prompt immediately returns, allowing further commands.
+
+6. Foreground vs Background Process
+Feature	Foreground Process	Background Process
+Uses current terminal	Yes	No
+Blocks terminal	Yes	No
+Prompt returns immediately	No	Yes
+Start command	command	command &
+Best for	Interactive programs	Servers and long-running tasks
+7. Moving Processes Between Foreground and Background
+Step 1: Run a Process
+sleep 60
+Step 2: Pause the Process
+
+Press
+
+Ctrl + Z
+
+The process becomes Stopped.
+
+Step 3: Continue in Background
+bg
+
+The stopped process resumes execution in the background.
+
+Step 4: Bring Back to Foreground
+fg
+
+The process again occupies the terminal.
+
+View Background Jobs
+jobs
+
+Example Output
+
+[1]+ Running sleep 60 &
+8. Practical Example for Cloud Engineers
+
+Suppose you start a web server.
+
+python3 -m http.server 8000 &
+
+Now continue working.
+
+ls
+pwd
+cat file.txt
+
+The web server continues running in the background.
+
+This is why Linux administrators and Cloud Engineers heavily use background processes.
+
+9. Interview Question
+What is the difference between a foreground process and a background process?
+
+Answer
+
+A foreground process runs attached to the current terminal and blocks further user commands until it completes, whereas a background process runs independently of the terminal, allowing the user to continue executing other commands.
+
+10. Server and Daemon
+What is a Server?
+
+A server is software that provides services to other programs (clients).
+
+Examples:
+
+Web server
+Database server
+SSH server
+DNS server
+What is a Daemon?
+
+A daemon is a background process that continuously runs and waits to provide services whenever requested.
+
+Characteristics
+
+Runs in background
+Usually starts automatically during system boot
+Does not require user interaction
+Continues until system shutdown
+Server vs Daemon
+Server	Daemon
+Provides services	Background process
+May run in foreground or background	Always runs in background
+Serves client requests	Executes continuously
+
+Most Linux servers operate as daemon processes.
+
+11. Common Linux Daemons
+Daemon	Purpose
+sshd	Remote SSH access
+httpd	Apache Web Server
+nginx	Nginx Web Server
+mysqld	MySQL Database Server
+cron	Scheduled task execution
+systemd	System and service manager
+dockerd	Docker Engine
+cupsd	Printing service
+12. Logs
+What are Logs?
+
+A log is a file that records system events, errors, warnings, and application activities.
+
+Logs act like a diary that continuously records everything happening inside the operating system.
+
+Example:
+
+10:00 SSH service started
+10:05 User nithin logged in
+10:08 Nginx started
+10:10 Database connection failed
+13. Importance of Logs
+
+Logs help administrators answer important questions:
+
+What happened?
+When did it happen?
+Which process caused the issue?
+Which user performed an action?
+What error occurred?
+
+Without logs, troubleshooting becomes extremely difficult.
+
+14. Common Linux Log Files
+Log File	Purpose
+/var/log/syslog	General system messages
+/var/log/auth.log	Login and authentication events
+/var/log/kern.log	Kernel messages
+/var/log/boot.log	Boot information
+/var/log/dpkg.log	Package installation history
+15. File Deletion Commands
+Delete a File
+rm file.txt
+
+Example
+
+rm notes.txt
+Delete Multiple Files
+rm file1.txt file2.txt file3.txt
+Delete All Text Files
+rm *.txt
+Ask Before Deleting
+rm -i notes.txt
+Force Delete
+rm -f notes.txt
+16. Empty a File Without Deleting It
+
+Method 1
+
+> notes.txt
+
+Method 2
+
+truncate -s 0 notes.txt
+
+Method 3
+
+echo "" > notes.txt
+17. Delete Lines Using sed
+Delete a Specific Line
+sed -i '2d' notes.txt
+Delete Multiple Lines
+sed -i '2,4d' notes.txt
+Delete First Line
+sed -i '1d' notes.txt
+Delete Last Line
+sed -i '$d' notes.txt
+Delete Lines Containing a Word
+sed -i '/Error/d' notes.txt
+18. Delete Words and Characters
+Delete a Word
+sed -i 's/love//g' notes.txt
+Delete a Character
+sed -i 's/://g' notes.txt
+Delete All Digits
+sed -i 's/[0-9]//g' file.txt
+Delete Blank Lines
+sed -i '/^$/d' notes.txt
+Delete Lines Starting with #
+sed -i '/^#/d' notes.txt
+Delete Last Five Lines
+head -n -5 notes.txt > temp.txt
+mv temp.txt notes.txt
+19. Deleting Content Using Vim
+
+Open file
+
+vim notes.txt
+Command	Action
+x	Delete one character
+dd	Delete current line
+5dd	Delete five lines
+dw	Delete one word
+d$	Delete to end of line
+D	Delete to end of line
+:%d	Delete entire file
+u	Undo
+Ctrl + r	Redo
+
+Save and Quit
+
+:wq
+
+Quit Without Saving
+
+:q!
+20. Deleting Content Using Nano
+
+Open
+
+nano notes.txt
+
+Useful Shortcuts
+
+Shortcut	Action
+Backspace/Delete	Delete character
+Ctrl + K	Cut (delete) current line
+Ctrl + U	Paste cut line
+Ctrl + O	Save
+Ctrl + X	Exit
+21. Quick Command Reference
+Task	Command
+Delete file	rm file.txt
+Delete multiple files	rm file1 file2 file3
+Delete all .txt files	rm *.txt
+Ask before deleting	rm -i file.txt
+Force delete	rm -f file.txt
+Empty a file	> file.txt
+Delete line 3	sed -i '3d' file.txt
+Delete lines 2–5	sed -i '2,5d' file.txt
+Delete first line	sed -i '1d' file.txt
+Delete last line	sed -i '$d' file.txt
+Delete lines containing ERROR	sed -i '/ERROR/d' file.txt
+Delete a word	sed -i 's/word//g' file.txt
+Delete all : characters	sed -i 's/://g' file.txt
+Delete all digits	sed -i 's/[0-9]//g' file.txt
+Delete blank lines	sed -i '/^$/d' file.txt
+Delete comment lines	sed -i '/^#/d' file.txt
+View background jobs	jobs
+Move stopped process to background	bg
+Bring process to foreground	fg
+Pause running process	Ctrl + Z
+Delete current line in Vim	dd
+Delete current line in Nano	Ctrl + K
+22. Summary
+
+In Linux, every running application is represented as a process, which can execute either in the foreground or background depending on how it is started and managed. Background processes are especially important for long-running services, commonly implemented as daemons, which provide continuous functionality such as web hosting, remote access, databases, and scheduled tasks. System and application activities are recorded in log files, making troubleshooting, auditing, and performance monitoring possible. Linux also provides a rich set of command-line tools such as rm, sed, vim, and nano for deleting files and modifying file contents efficiently. Mastering these concepts is essential for Linux system administration, Cloud Engineering, DevOps, and server management.
