@@ -1238,5 +1238,355 @@ Useful Shortcuts
 In Linux, every running application is represented as a **process**, which can execute either in the **foreground** or **background** depending on how it is started and managed. Background processes are especially important for long-running services, commonly implemented as **daemons**, which provide continuous functionality such as web hosting, remote access, databases, and scheduled tasks. System and application activities are recorded in **log files**, making troubleshooting, auditing, and performance monitoring possible. Linux also provides a rich set of command-line tools such as `rm`, `sed`, `vim`, and `nano` for deleting files and modifying file contents efficiently. Mastering these concepts is essential for Linux system administration, Cloud Engineering, DevOps, and server management.
 
 
+# Linux Documentation – Service Management Using `systemctl`
+
+## Introduction
+
+In Linux, many applications such as SSH, Apache, MySQL, and Docker run as **services (daemons)** in the background. These services are managed by **systemd**, the default service manager in most modern Linux distributions.
+
+The **`systemctl`** command is the primary tool used to control and monitor these services.
+
+**General Syntax**
+
+```bash
+systemctl <command> <service_name>
+```
+
+Example:
+
+```bash
+systemctl status ssh
+```
+
+---
+
+# 1. `systemctl status`
+
+## Definition
+
+The `status` command displays the **current state and detailed information** about a service.
+
+## Syntax
+
+```bash
+systemctl status <service_name>
+```
+
+## Examples
+
+```bash
+systemctl status ssh
+```
+
+```bash
+systemctl status apache2
+```
+
+## How It Works
+
+When the command is executed:
+
+1. `systemctl` sends a request to **systemd**.
+2. `systemd` checks whether the service exists.
+3. It retrieves the current status of the service.
+4. It displays information such as:
+
+   * Whether the service is running or stopped.
+   * Process ID (PID).
+   * Service description.
+   * Recent log messages.
+
+## Why It Is Used
+
+* Verify whether a service is running.
+* Troubleshoot service failures.
+* View service details before performing maintenance.
+
+## Real-World Example
+
+Suppose users report that they cannot access your Linux server using SSH.
+
+Run:
+
+```bash
+systemctl status ssh
+```
+
+If the output shows **Active: inactive**, the SSH service is not running and needs to be started.
+
+---
+
+# 2. `systemctl start`
+
+## Definition
+
+The `start` command starts a service that is currently stopped.
+
+## Syntax
+
+```bash
+sudo systemctl start <service_name>
+```
+
+## Examples
+
+```bash
+sudo systemctl start ssh
+```
+
+```bash
+sudo systemctl start apache2
+```
+
+## How It Works
+
+1. `systemctl` sends a start request to `systemd`.
+2. `systemd` reads the service configuration.
+3. It launches the service as a background process (daemon).
+4. The service begins accepting requests.
+
+## Why It Is Used
+
+* Start services after installation.
+* Bring services online after maintenance.
+* Start services without rebooting the system.
+
+## Real-World Example
+
+After installing Apache, the web server is not running.
+
+Start it using:
+
+```bash
+sudo systemctl start apache2
+```
+
+Now users can access the hosted website.
+
+---
+
+# 3. `systemctl stop`
+
+## Definition
+
+The `stop` command stops a running service.
+
+## Syntax
+
+```bash
+sudo systemctl stop <service_name>
+```
+
+## Example
+
+```bash
+sudo systemctl stop apache2
+```
+
+## How It Works
+
+1. `systemctl` requests `systemd` to stop the service.
+2. `systemd` sends a termination signal.
+3. The service closes active tasks and shuts down gracefully.
+
+## Why It Is Used
+
+* Perform maintenance.
+* Upgrade software.
+* Troubleshoot problems.
+* Reduce unnecessary resource usage.
+
+## Real-World Example
+
+Before upgrading Apache, stop the web server:
+
+```bash
+sudo systemctl stop apache2
+```
+
+After the upgrade, start it again.
+
+---
+
+# 4. `systemctl restart`
+
+## Definition
+
+The `restart` command stops a service and immediately starts it again.
+
+## Syntax
+
+```bash
+sudo systemctl restart <service_name>
+```
+
+## Examples
+
+```bash
+sudo systemctl restart apache2
+```
+
+```bash
+sudo systemctl restart ssh
+```
+
+## How It Works
+
+1. The running service is stopped.
+2. A new instance of the service is started.
+3. The service begins running with the latest configuration.
+
+## Why It Is Used
+
+* Apply configuration changes.
+* Recover from temporary failures.
+* Refresh the service without rebooting the server.
+
+## Real-World Example
+
+You modify the Apache configuration file:
+
+```text
+/etc/apache2/apache2.conf
+```
+
+To apply the changes:
+
+```bash
+sudo systemctl restart apache2
+```
+
+Without restarting, Apache continues using the old configuration.
+
+---
+
+# 5. `systemctl list-units --type=service`
+
+## Definition
+
+Displays all services currently loaded and managed by `systemd`.
+
+## Syntax
+
+```bash
+systemctl list-units --type=service
+```
+
+## How It Works
+
+1. `systemctl` requests information from `systemd`.
+2. `systemd` retrieves all loaded service units.
+3. A list of services and their current states is displayed.
+
+## Why It Is Used
+
+* View all running services.
+* Identify failed or inactive services.
+* Monitor the overall status of the system.
+
+## Real-World Example
+
+A Cloud Engineer wants to check which services are active on a production server.
+
+Running:
+
+```bash
+systemctl list-units --type=service
+```
+
+displays services such as:
+
+* `ssh.service`
+* `apache2.service`
+* `cron.service`
+* `docker.service`
+
+This helps quickly verify the health of important services.
+
+---
+
+# 6. `systemctl status ssh`
+
+## Definition
+
+Displays the status of the **SSH (Secure Shell)** service.
+
+## How It Works
+
+It checks whether the SSH daemon (`sshd`) is running and accepting remote connections.
+
+## Why It Is Used
+
+* Verify remote login availability.
+* Troubleshoot SSH connection problems.
+* Confirm that the SSH server is active.
+
+## Real-World Example
+
+If you cannot connect to an AWS EC2 instance using SSH, check:
+
+```bash
+systemctl status ssh
+```
+
+If the service is inactive, start it:
+
+```bash
+sudo systemctl start ssh
+```
+
+---
+
+# 7. `systemctl status apache2`
+
+## Definition
+
+Displays the status of the Apache2 web server service.
+
+## How It Works
+
+It checks whether the Apache web server is running and serving web pages.
+
+## Why It Is Used
+
+* Verify website availability.
+* Troubleshoot web server issues.
+* Confirm that Apache is running after configuration changes.
+
+## Real-World Example
+
+Users report that a website is unavailable.
+
+Run:
+
+```bash
+systemctl status apache2
+```
+
+If Apache is stopped, start it:
+
+```bash
+sudo systemctl start apache2
+```
+
+The website becomes accessible again.
+
+---
+
+# Quick Reference
+
+| Command                               | Purpose                                 |
+| ------------------------------------- | --------------------------------------- |
+| `systemctl status <service>`          | Display the current status of a service |
+| `sudo systemctl start <service>`      | Start a stopped service                 |
+| `sudo systemctl stop <service>`       | Stop a running service                  |
+| `sudo systemctl restart <service>`    | Restart a service to apply changes      |
+| `systemctl list-units --type=service` | List all services managed by `systemd`  |
+
+---
+
+# Summary
+
+The `systemctl` command is used to manage Linux services controlled by `systemd`. The `status` command helps monitor the health of a service, `start` brings a stopped service online, `stop` safely shuts down a running service, and `restart` reloads a service after configuration changes or failures. The `list-units --type=service` command provides an overview of all services managed by the system. In real-world environments, Cloud Engineers, Linux Administrators, and DevOps Engineers use these commands daily to manage services such as **SSH** for secure remote access and **Apache2** for hosting websites and web applications.
 
 
