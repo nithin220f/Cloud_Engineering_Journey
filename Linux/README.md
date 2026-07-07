@@ -1589,4 +1589,341 @@ The website becomes accessible again.
 
 The `systemctl` command is used to manage Linux services controlled by `systemd`. The `status` command helps monitor the health of a service, `start` brings a stopped service online, `stop` safely shuts down a running service, and `restart` reloads a service after configuration changes or failures. The `list-units --type=service` command provides an overview of all services managed by the system. In real-world environments, Cloud Engineers, Linux Administrators, and DevOps Engineers use these commands daily to manage services such as **SSH** for secure remote access and **Apache2** for hosting websites and web applications.
 
+# Linux Networking & Cloud Commands Documentation
+
+## 1. `hostname`
+
+### What does it show?
+
+Displays the **hostname** (name) of the current Linux system or server.
+
+### Why is it useful?
+
+* Identifies the server you are logged into.
+* Useful when managing multiple cloud servers.
+* Helps avoid making changes on the wrong machine.
+
+### Example
+
+```bash
+hostname
+```
+
+**Sample Output**
+
+```bash
+ubuntu-server
+```
+
+### Real-World Use Case
+
+After connecting to a cloud VM (AWS EC2, Azure VM, GCP VM), run `hostname` to confirm which server you are working on.
+
+---
+
+# 2. `hostname -I`
+
+### What does it show?
+
+Displays all **IP addresses** assigned to the system.
+
+### Why is it useful?
+
+* Quickly find the server's IP address.
+* Verify network configuration.
+* Useful for SSH, web servers, and cloud networking.
+
+### Example
+
+```bash
+hostname -I
+```
+
+**Sample Output**
+
+```bash
+192.168.1.15 172.17.0.1
+```
+
+### Real-World Use Case
+
+Check the private IP of an EC2 instance before connecting another server to it.
+
+---
+
+# 3. `ip addr`
+
+### What does it show?
+
+Displays detailed information about all network interfaces.
+
+### Information Displayed
+
+* Interface name
+* IPv4/IPv6 addresses
+* MAC address
+* Interface status (UP/DOWN)
+* MTU
+
+### Why is it useful?
+
+* Verify IP addresses.
+* Check if a network interface is active.
+* Troubleshoot networking issues.
+
+### Example
+
+```bash
+ip addr
+```
+
+**Sample Output**
+
+```bash
+2: eth0:
+    inet 192.168.1.15/24
+```
+
+### Real-World Use Case
+
+If a server cannot connect to the network, check whether the interface is UP and has an IP address.
+
+---
+
+# 4. `ip route`
+
+### What does it show?
+
+Displays the **routing table** and **default gateway**.
+
+### Information Displayed
+
+* Default gateway
+* Network routes
+* Interface used
+* Source IP
+
+### Why is it useful?
+
+* Verify routing configuration.
+* Check the default gateway.
+* Troubleshoot internet connectivity.
+
+### Example
+
+```bash
+ip route
+```
+
+**Sample Output**
+
+```bash
+default via 192.168.1.1 dev eth0
+192.168.1.0/24 dev eth0
+```
+
+### Real-World Use Case
+
+If a cloud VM cannot access the internet, verify that the default route exists.
+
+---
+
+# 5. `ping google.com`
+
+### What does it show?
+
+Tests connectivity to **google.com** by sending ICMP Echo Requests.
+
+### Information Displayed
+
+* Host reachability
+* Latency (response time)
+* Packet loss
+* DNS resolution
+
+### Why is it useful?
+
+* Verify internet connectivity.
+* Check DNS resolution.
+* Measure network latency.
+
+### Example
+
+```bash
+ping google.com
+```
+
+### Stop the Command
+
+```bash
+Ctrl + C
+```
+
+### Real-World Use Case
+
+If websites are not opening, use this command to verify whether DNS and internet connectivity are working.
+
+---
+
+# 6. `ping 8.8.8.8`
+
+### What does it show?
+
+Tests connectivity to the IP address **8.8.8.8**.
+
+### Information Displayed
+
+* Internet connectivity
+* Latency
+* Packet loss
+
+### Why is it useful?
+
+* Tests internet access without DNS.
+* Helps identify whether the issue is with DNS or the network.
+
+### Example
+
+```bash
+ping 8.8.8.8
+```
+
+### Real-World Use Case
+
+If `ping 8.8.8.8` works but `ping google.com` fails, the internet connection is working but DNS is not.
+
+---
+
+# 7. `curl https://example.com`
+
+### What does it show?
+
+Sends an HTTP GET request and displays the server's response.
+
+### Information Displayed
+
+* HTML content
+* JSON response
+* API response
+
+### Why is it useful?
+
+* Test websites.
+* Test REST APIs.
+* Verify web server availability.
+
+### Example
+
+```bash
+curl https://example.com
+```
+
+### Real-World Use Case
+
+Cloud engineers use `curl` to verify that web applications and APIs are responding correctly.
+
+---
+
+# 8. `wget https://example.com`
+
+### What does it show?
+
+Downloads content from a URL and saves it to the current directory.
+
+### Why is it useful?
+
+* Download software.
+* Download backups.
+* Retrieve scripts and configuration files.
+* Automate downloads.
+
+### Example
+
+```bash
+wget https://example.com
+```
+
+### Sample Output
+
+```bash
+Saving to: 'index.html'
+```
+
+### Real-World Use Case
+
+Used in deployment scripts to download installation packages or configuration files.
+
+---
+
+# 9. `ss -tuln`
+
+### What does it show?
+
+Displays all **TCP and UDP ports** currently listening on the system.
+
+### Option Breakdown
+
+| Option | Meaning                            |
+| ------ | ---------------------------------- |
+| `-t`   | TCP sockets                        |
+| `-u`   | UDP sockets                        |
+| `-l`   | Listening ports only               |
+| `-n`   | Numeric addresses and port numbers |
+
+### Why is it useful?
+
+* Check which services are running.
+* Verify open ports.
+* Troubleshoot applications.
+* Validate server configuration.
+
+### Example
+
+```bash
+ss -tuln
+```
+
+**Sample Output**
+
+```bash
+tcp LISTEN 0 128 0.0.0.0:22
+tcp LISTEN 0 511 0.0.0.0:80
+```
+
+### Real-World Use Case
+
+After starting SSH or a web server, verify that the expected port is listening.
+
+---
+
+# Quick Comparison Table
+
+| Command           | What it Shows             | Primary Use                           |
+| ----------------- | ------------------------- | ------------------------------------- |
+| `hostname`        | Hostname                  | Identify the server                   |
+| `hostname -I`     | IP addresses              | Find the server's IP                  |
+| `ip addr`         | Network interface details | Check interfaces and IP configuration |
+| `ip route`        | Routing table             | Verify routes and default gateway     |
+| `ping google.com` | Connectivity + DNS        | Test internet and DNS                 |
+| `ping 8.8.8.8`    | Connectivity only         | Test internet without DNS             |
+| `curl URL`        | HTTP response             | Test websites and APIs                |
+| `wget URL`        | Downloads files           | Download web content                  |
+| `ss -tuln`        | Listening TCP/UDP ports   | Verify running network services       |
+
+---
+
+# Interview Cheat Sheet
+
+| Command           | One-Line Answer                                           |
+| ----------------- | --------------------------------------------------------- |
+| `hostname`        | Shows the system's hostname.                              |
+| `hostname -I`     | Shows all IP addresses assigned to the system.            |
+| `ip addr`         | Displays detailed network interface information.          |
+| `ip route`        | Shows the routing table and default gateway.              |
+| `ping google.com` | Tests internet connectivity and DNS resolution.           |
+| `ping 8.8.8.8`    | Tests internet connectivity without DNS.                  |
+| `curl URL`        | Sends an HTTP request and displays the server's response. |
+| `wget URL`        | Downloads a file or web page from the internet.           |
+| `ss -tuln`        | Displays all listening TCP and UDP ports.                 |
+
 
