@@ -1,0 +1,363 @@
+Day 11 Documentation – Nginx Web Server & Static Website Hosting on AWS EC2
+
+Aim
+
+To install the Nginx web server on an Ubuntu EC2 instance, understand the web root directory, host a static website, and manage web server files and services.
+
+
+---
+
+Experiment 1: Install Nginx
+
+Command
+
+sudo apt update
+sudo apt install nginx -y
+
+Purpose
+
+apt update downloads the latest package information from repositories.
+
+apt install nginx installs the Nginx web server.
+
+
+
+---
+
+What is Nginx?
+
+Nginx is an open-source web server that serves web pages to users over HTTP and HTTPS. It is widely used because it is lightweight, fast, and capable of handling thousands of simultaneous connections.
+
+Uses of Nginx
+
+Web server
+
+Reverse proxy
+
+Load balancer
+
+Static file hosting
+
+API gateway
+
+
+
+---
+
+Experiment 2: Verify Nginx Service
+
+Command
+
+sudo systemctl status nginx
+
+Output
+
+Active: active (running)
+
+Explanation
+
+This confirms that the Nginx service is running successfully.
+
+
+---
+
+Experiment 3: Open the Website
+
+Open:
+
+http://Public-IP
+
+You successfully saw:
+
+Welcome to nginx!
+
+This means:
+
+EC2 instance is running.
+
+Nginx is installed.
+
+Port 80 is open.
+
+Security Group allows HTTP traffic.
+
+The web server is functioning correctly.
+
+
+
+---
+
+Experiment 4: Understand the Web Root Directory
+
+Move into the Nginx web directory:
+
+cd /var/www/html
+
+Check files:
+
+ls -l
+
+Output:
+
+index.nginx-debian.html
+
+
+---
+
+What is /var/www/html?
+
+/var/www/html is the default document root of Nginx in Ubuntu.
+
+A document root is the directory from which the web server serves files to users.
+
+When someone visits:
+
+http://Public-IP
+
+Nginx automatically searches for:
+
+/var/www/html/index.html
+
+or
+
+/var/www/html/index.nginx-debian.html
+
+and displays that file in the browser.
+
+
+---
+
+Experiment 5: Error Faced
+
+You entered:
+
+cd var/www/html
+
+Error:
+
+No such file or directory
+
+Reason
+
+You forgot the leading slash.
+
+Incorrect:
+
+cd var/www/html
+
+Correct:
+
+cd /var/www/html
+
+
+---
+
+Relative Path vs Absolute Path
+
+Relative Path
+
+var/www/html
+
+Starts from the current directory.
+
+Absolute Path
+
+/var/www/html
+
+Starts from the root directory (/).
+
+Cloud engineers generally use absolute paths while administering servers.
+
+
+---
+
+Experiment 6: Create a Custom Web Page
+
+Create a webpage:
+
+sudo nano /var/www/html/index.html
+
+Example:
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>My First AWS Website</title>
+</head>
+<body>
+<h1>Hello AWS!</h1>
+<h2>Welcome to my Cloud Engineer journey.</h2>
+</body>
+</html>
+
+Save:
+
+Ctrl + O
+
+Enter
+
+Ctrl + X
+
+
+
+---
+
+Experiment 7: Verify Website Files
+
+ls -l /var/www/html
+
+Example:
+
+-rw-r--r-- index.html
+-rw-r--r-- index.nginx-debian.html
+
+This confirms that the webpage exists inside the web root.
+
+
+---
+
+Experiment 8: Restart Nginx
+
+sudo systemctl restart nginx
+
+Purpose
+
+Reloads the web server and applies new changes.
+
+
+---
+
+Experiment 9: Access the Website
+
+Open:
+
+http://Public-IP
+
+Your custom webpage should now appear instead of the default Nginx page.
+
+
+---
+
+Nginx Service Management Commands
+
+Start Nginx:
+
+sudo systemctl start nginx
+
+Stop Nginx:
+
+sudo systemctl stop nginx
+
+Restart Nginx:
+
+sudo systemctl restart nginx
+
+Check status:
+
+sudo systemctl status nginx
+
+Enable automatic startup:
+
+sudo systemctl enable nginx
+
+
+---
+
+Nginx Logs
+
+Access logs:
+
+sudo tail -20 /var/log/nginx/access.log
+
+Error logs:
+
+sudo tail -20 /var/log/nginx/error.log
+
+Purpose
+
+Logs help Cloud Engineers troubleshoot website failures and monitor traffic.
+
+
+---
+
+Security Group Requirement
+
+For users to access the website:
+
+Type	Port	Source
+
+HTTP	80	0.0.0.0/0
+
+
+Without this rule, the website cannot be accessed from the browser.
+
+
+---
+
+Day 11 Concepts Learned
+
+Nginx
+
+Web server
+
+Static website hosting
+
+Document root
+
+/var/www/html
+
+HTTP (Port 80)
+
+Linux file editing with Nano
+
+Relative and absolute paths
+
+Service management using systemctl
+
+Nginx logs
+
+Security Groups
+
+
+
+---
+
+Errors Solved During Day 11
+
+Error 1: Wrong Path
+
+cd var/www/html
+
+Solution:
+
+cd /var/www/html
+
+
+---
+
+Error 2: Website Not Opening
+
+Checklist:
+
+1. EC2 instance running.
+
+
+2. Nginx installed.
+
+
+3. Nginx service running.
+
+
+4. Port 80 allowed in Security Group.
+
+
+5. Use the correct Public IP.
+
+
+
+
+---
+
+Conclusion
+
+By completing Day 11, you successfully deployed and managed a real web server on AWS EC2. You installed Nginx, configured a website, learned Linux web directories, managed services, and hosted your first static website—core practical skills used by Cloud Engineers and DevOps Engineers.
