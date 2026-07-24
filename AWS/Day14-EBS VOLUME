@@ -1,0 +1,347 @@
+AWS Cloud Engineer Roadmap – Day 14 Documentation
+
+Topic: Amazon Elastic Block Store (Amazon EBS) – Hands-on Lab
+
+
+---
+
+Day 14 Objectives
+
+On Day 14, I learned how to work with Amazon Elastic Block Store (Amazon EBS). The focus was on creating additional block storage for an Amazon EC2 instance, attaching the volume, formatting it with a Linux file system, mounting it, and configuring it to mount automatically after every reboot.
+
+This lab demonstrated how Cloud Engineers expand storage for servers without replacing the EC2 instance.
+
+
+---
+
+What is Amazon EBS?
+
+According to AWS Cloud Practitioner Essentials (AWS Skill Builder):
+
+Amazon Elastic Block Store (Amazon EBS) is a durable block-level storage service designed for use with Amazon EC2 instances. Amazon EBS volumes behave like raw, unformatted block devices that you can format with a file system and mount to an operating system.
+
+Amazon EBS is designed for workloads that require frequent updates, low-latency access, and persistent storage.
+
+
+---
+
+Features of Amazon EBS
+
+Persistent block storage for Amazon EC2.
+
+Data remains available even if the EC2 instance is stopped.
+
+Supports snapshots for backup and disaster recovery.
+
+Provides high durability and availability within an Availability Zone.
+
+Supports multiple volume types such as gp3, gp2, io1, io2, st1, and sc1.
+
+Can increase storage capacity without replacing the EC2 instance.
+
+
+
+---
+
+Amazon EBS Volume Types
+
+General Purpose SSD (gp3)
+
+Recommended for most workloads.
+
+Delivers consistent performance.
+
+Suitable for operating systems, application servers, and development environments.
+
+
+General Purpose SSD (gp2)
+
+Previous generation SSD volume.
+
+Performance depends on volume size.
+
+
+Provisioned IOPS SSD (io1 / io2)
+
+Designed for mission-critical applications.
+
+Suitable for databases requiring high IOPS.
+
+
+Throughput Optimized HDD (st1)
+
+Designed for frequently accessed HDD workloads.
+
+
+Cold HDD (sc1)
+
+Designed for infrequently accessed data.
+
+
+
+---
+
+Difference Between Amazon EBS and Amazon S3
+
+Amazon EBS	Amazon S3
+
+Block storage	Object storage
+Attached to EC2	Accessed through APIs
+Low latency	High scalability
+Supports operating systems	Cannot host an operating system
+Mounted as a disk	Stores objects in buckets
+
+
+
+---
+
+Practical Lab Performed
+
+Step 1 – Created an EBS Volume
+
+Created a new 2 GiB gp3 EBS volume in the same Availability Zone as the EC2 instance.
+
+Reason: An EBS volume can only be attached to an EC2 instance located in the same Availability Zone.
+
+
+---
+
+Step 2 – Attached the Volume
+
+Attached the newly created EBS volume to the running EC2 instance.
+
+AWS assigned the device name:
+
+/dev/xvdf
+
+
+---
+
+Step 3 – Verified the New Disk
+
+Command used:
+
+lsblk
+
+Purpose:
+
+Displays all block storage devices attached to the Linux instance.
+
+Observed:
+
+xvdf
+
+representing the newly attached EBS volume.
+
+
+---
+
+Step 4 – Created a File System
+
+Command:
+
+sudo mkfs.ext4 /dev/xvdf
+
+Purpose:
+
+Formats the new EBS volume with the ext4 Linux file system.
+
+Observation:
+
+When attempted again after mounting, Linux displayed:
+
+/dev/xvdf is mounted; will not make a filesystem here
+
+Reason:
+
+Linux prevents formatting a mounted volume to avoid accidental data loss.
+
+
+---
+
+Step 5 – Created a Mount Point
+
+Command:
+
+sudo mkdir /data
+
+Purpose:
+
+Creates a directory where the EBS volume will be mounted.
+
+
+---
+
+Step 6 – Mounted the Volume
+
+Command:
+
+sudo mount /dev/xvdf /data
+
+Purpose:
+
+Mounts the EBS volume so the operating system can access it.
+
+
+---
+
+Step 7 – Verified the Mount
+
+Command:
+
+df -h
+
+Purpose:
+
+Displays mounted file systems and available storage.
+
+Observation:
+
+The EBS volume appeared mounted on:
+
+/data
+
+
+---
+
+Step 8 – Retrieved the UUID
+
+Command:
+
+sudo blkid
+
+Purpose:
+
+Displays filesystem information, including the UUID.
+
+Example:
+
+UUID="295ac1e5-10a8-4a86-9df6-5104d7b6a3ac"
+
+
+---
+
+Step 9 – Configured Automatic Mounting
+
+Opened:
+
+sudo nano /etc/fstab
+
+Added:
+
+UUID=295ac1e5-10a8-4a86-9df6-5104d7b6a3ac /data ext4 defaults,nofail 0 2
+
+Purpose:
+
+Ensures the EBS volume mounts automatically after every reboot.
+
+
+---
+
+Step 10 – Verified the Configuration
+
+Command:
+
+sudo mount -a
+
+Observation:
+
+No error was displayed.
+
+Meaning:
+
+The /etc/fstab configuration is correct.
+
+
+---
+
+Commands Practiced
+
+lsblk
+sudo fdisk -l
+sudo mkfs.ext4 /dev/xvdf
+sudo mkdir /data
+sudo mount /dev/xvdf /data
+df -h
+sudo blkid
+sudo nano /etc/fstab
+sudo mount -a
+
+
+---
+
+Problems Faced
+
+Problem 1
+
+/dev/xvdf is mounted; will not make a filesystem here
+
+Reason:
+
+The EBS volume had already been mounted.
+
+Solution:
+
+Did not format the mounted volume again.
+
+
+---
+
+Problem 2
+
+Finding the UUID.
+
+Solution:
+
+Used:
+
+sudo blkid
+
+Copied the UUID and configured /etc/fstab.
+
+
+---
+
+Key Learnings
+
+Amazon EBS provides persistent block storage for EC2 instances.
+
+An EBS volume must be in the same Availability Zone as the EC2 instance.
+
+A new EBS volume should be formatted before use.
+
+Linux accesses EBS volumes after they are mounted.
+
+UUID is preferred over device names in /etc/fstab because device names can change after reboot.
+
+sudo mount -a validates the /etc/fstab configuration.
+
+Snapshots provide backups of Amazon EBS volumes.
+
+
+
+---
+
+Interview Questions
+
+1. What is Amazon EBS?
+Amazon EBS is a durable block storage service designed for use with Amazon EC2 instances.
+
+2. Why is UUID used in /etc/fstab?
+UUID uniquely identifies the file system and ensures reliable mounting even if the device name changes.
+
+3. Can an EBS volume be attached to an EC2 instance in another Availability Zone?
+No. Both the EBS volume and the EC2 instance must be in the same Availability Zone.
+
+4. What is the purpose of mount?
+It makes the file system accessible to the operating system through a directory.
+
+5. What does sudo mount -a do?
+It mounts all file systems defined in /etc/fstab and helps verify that the configuration is valid.
+
+
+---
+
+Day 14 Outcome
+
+Successfully created, attached, formatted, mounted, and configured an Amazon EBS volume for automatic mounting on an Amazon EC2 instance. Gained practical experience in Linux storage management and AWS block storage administration, strengthening core skills required for a Cloud Engineer role.
