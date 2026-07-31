@@ -1,0 +1,387 @@
+# **AWS Cloud Engineer Roadmap – Day 18 Documentation**
+
+## **Topic: SEV-1 Production Incident – Root Cause Analysis of HTTP 502 Bad Gateway**
+
+---
+
+# Day 18 Objective
+
+The objective of Day 18 was to simulate a **Severity-1 (SEV-1) Production Incident** and develop the skills required to investigate, isolate, and communicate the root cause of a critical service outage. The emphasis was on **logical troubleshooting**, **fault isolation**, and **professional incident communication** rather than simply executing commands.
+
+---
+
+# Production Scenario
+
+### Incident
+
+**Time:** 8:45 AM
+
+The company's production website became unavailable, affecting more than **20,000 users**. The CEO requested status updates every 15 minutes, making this a high-priority incident.
+
+### Initial Environment Status
+
+The following components were already verified and functioning correctly:
+
+* EC2 Instance: Running
+* CPU Utilization: Normal (12%)
+* Memory Usage: Normal
+* Security Group: HTTP (80) and HTTPS (443) Allowed
+* Internet Gateway: Attached
+* Route Table: Correctly Configured
+* SSH Connectivity: Successful
+* Nginx Service: Active (Running)
+
+Despite all infrastructure components being healthy, users received the following browser error:
+
+```text
+502 Bad Gateway
+```
+
+---
+
+# Understanding HTTP 502 Bad Gateway
+
+A **502 Bad Gateway** error occurs when a reverse proxy server (such as **Nginx**) cannot obtain a valid response from the backend application server.
+
+### Typical Web Application Architecture
+
+```text
+Client Browser
+      │
+      ▼
+    Nginx
+      │
+      ▼
+Backend Application
+(Flask / FastAPI / Django)
+      │
+      ▼
+   Database
+```
+
+Nginx acts as a reverse proxy and forwards client requests to the backend application. If the backend crashes, fails to start, or becomes unreachable, Nginx returns **HTTP 502 Bad Gateway**.
+
+---
+
+# Incident Investigation Process
+
+A Cloud Engineer should avoid making assumptions and instead eliminate potential causes based on available evidence.
+
+## Step 1 – Eliminate Infrastructure Components
+
+Since the following components were already verified:
+
+* EC2 Instance
+* Public IP Address
+* Security Group
+* Internet Gateway
+* Route Table
+* SSH Connectivity
+* Nginx Service
+
+they were eliminated as the root cause.
+
+### Conclusion
+
+The AWS infrastructure was functioning normally, shifting the investigation toward the backend application.
+
+---
+
+## Step 2 – Understand the Role of Nginx
+
+Nginx does not execute application code.
+
+Its responsibility is to receive requests from clients and forward them to backend services such as:
+
+* Flask
+* FastAPI
+* Django
+
+If the backend application is unavailable, Nginx cannot process the request and returns **502 Bad Gateway**.
+
+---
+
+## Step 3 – Backend Service Investigation
+
+The backend application status was checked.
+
+Example:
+
+```bash
+sudo systemctl status myapp
+```
+
+Output:
+
+```text
+Active: failed (Result: exit-code)
+```
+
+### Interpretation
+
+The backend application failed to start successfully.
+
+Possible reasons include:
+
+* Missing dependencies
+* Deployment failure
+* Incorrect application configuration
+* Runtime exceptions
+* Missing environment variables
+
+---
+
+## Step 4 – Preserve Evidence Before Restarting
+
+One of the most important lessons of Day 18 was:
+
+**Do not restart services immediately.**
+
+Restarting services without investigation may remove valuable diagnostic information.
+
+Instead, the Cloud Engineer should first collect evidence by examining system and application logs.
+
+---
+
+## Step 5 – Log Analysis
+
+Application logs displayed:
+
+```text
+ModuleNotFoundError:
+No module named 'flask'
+```
+
+### Interpretation
+
+Python attempted to import the Flask framework but could not locate the installed package.
+
+Possible reasons:
+
+* Flask package not installed
+* Virtual environment not activated
+* Incorrect Python interpreter
+* Incomplete deployment
+* Missing dependency installation
+
+This indicates an **application deployment issue**, not an AWS infrastructure problem.
+
+---
+
+# Root Cause Analysis
+
+## Problem
+
+Backend application failed during startup because the Flask dependency was unavailable.
+
+## AWS Status
+
+Healthy.
+
+Infrastructure components were operating normally.
+
+## Network Status
+
+Healthy.
+
+No connectivity issues were identified.
+
+## Application Status
+
+Failed during startup because required Python modules were missing.
+
+---
+
+# Responsibility Matrix
+
+| Component            | Status           | Responsible Team |
+| -------------------- | ---------------- | ---------------- |
+| EC2 Instance         | Healthy          | Cloud Team       |
+| Security Group       | Healthy          | Cloud Team       |
+| Internet Gateway     | Healthy          | Cloud Team       |
+| Route Table          | Healthy          | Cloud Team       |
+| SSH Connectivity     | Healthy          | Cloud Team       |
+| Nginx                | Healthy          | Cloud Team       |
+| Backend Application  | Failed           | Development Team |
+| Missing Flask Module | Deployment Issue | Development Team |
+
+---
+
+# Commands Practiced
+
+Check backend application status:
+
+```bash
+sudo systemctl status myapp
+```
+
+Check Nginx status:
+
+```bash
+sudo systemctl status nginx
+```
+
+View system logs:
+
+```bash
+sudo journalctl -xe
+```
+
+View Nginx error logs:
+
+```bash
+sudo tail -20 /var/log/nginx/error.log
+```
+
+Check listening ports:
+
+```bash
+sudo ss -tuln
+```
+
+List running processes:
+
+```bash
+ps aux
+```
+
+---
+
+# Incident Troubleshooting Workflow
+
+```text
+Website Down
+      │
+      ▼
+EC2 Running?
+      │
+     Yes
+      │
+      ▼
+SSH Working?
+      │
+     Yes
+      │
+      ▼
+Security Group Correct?
+      │
+     Yes
+      │
+      ▼
+Nginx Running?
+      │
+     Yes
+      │
+      ▼
+Backend Application Running?
+      │
+      No
+      │
+      ▼
+Check Application Logs
+      │
+      ▼
+Identify Root Cause
+      │
+      ▼
+Fix Deployment Issue
+      │
+      ▼
+Restart Application
+      │
+      ▼
+Verify Website
+```
+
+---
+
+# Professional Incident Communication
+
+A Cloud Engineer should provide concise and evidence-based updates.
+
+### Example Incident Update
+
+> "The AWS infrastructure has been verified and is functioning correctly. The EC2 instance, networking components, and Nginx service are healthy. Investigation identified that the backend application failed to start due to a missing Python dependency (`ModuleNotFoundError: No module named 'flask'`). This is an application deployment issue. The Development Team has been informed, and corrective actions are underway."
+
+---
+
+# Key Concepts Learned
+
+## Reverse Proxy
+
+A reverse proxy receives client requests and forwards them to backend application servers.
+
+Examples:
+
+* Nginx
+* HAProxy
+* Apache HTTP Server
+
+---
+
+## Backend Application
+
+The backend application contains the business logic and processes user requests.
+
+Examples:
+
+* Flask
+* FastAPI
+* Django
+
+---
+
+## Fault Isolation
+
+Fault isolation is the process of systematically eliminating healthy components to identify the actual source of a problem.
+
+---
+
+## Evidence-Based Troubleshooting
+
+A Cloud Engineer should:
+
+1. Gather evidence.
+2. Analyze logs.
+3. Identify the root cause.
+4. Apply corrective actions.
+
+Avoid restarting services before understanding why they failed.
+
+---
+
+# Interview Questions
+
+### 1. What does HTTP 502 Bad Gateway indicate?
+
+It indicates that a reverse proxy server (such as Nginx) did not receive a valid response from the backend application server.
+
+---
+
+### 2. If EC2, Security Groups, and Nginx are healthy, where should the investigation continue?
+
+The investigation should move to the backend application and its logs.
+
+---
+
+### 3. Why should logs be reviewed before restarting services?
+
+Logs preserve diagnostic information that helps determine the root cause of the failure.
+
+---
+
+### 4. Is `ModuleNotFoundError` an AWS issue?
+
+No. It is an application or deployment issue related to missing Python dependencies.
+
+---
+
+### 5. Which team is responsible for resolving `ModuleNotFoundError`?
+
+The Development Team, as the issue originates from the application deployment and dependency management.
+
+---
+
+# Day 18 Outcome
+
+By completing Day 18, I learned how to handle a critical production incident using a structured troubleshooting methodology. I practiced eliminating healthy infrastructure components, identifying backend application failures, interpreting application logs, distinguishing AWS infrastructure issues from application deployment issues, and communicating incident status professionally. This exercise strengthened my ability to perform root cause analysis and respond effectively to real-world cloud production outages.
