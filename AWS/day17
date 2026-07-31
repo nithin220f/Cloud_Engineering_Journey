@@ -1,0 +1,350 @@
+# **AWS Cloud Engineer Roadmap – Day 17 Documentation**
+
+## **Topic: Production Incident Troubleshooting – 502 Bad Gateway (Nginx Reverse Proxy)**
+
+---
+
+# Day 17 Objective
+
+The objective of Day 17 was to develop a **Cloud Engineer's troubleshooting mindset** by investigating a real-world production incident rather than simply executing commands.
+
+Today's focus was on understanding how to identify and isolate the root cause of a **502 Bad Gateway** error in an AWS-hosted web application.
+
+---
+
+# Production Scenario
+
+### Incident
+
+**Time:** 10:30 AM
+
+The Development Team reported:
+
+> "Our website was working yesterday. After today's deployment, users are seeing **502 Bad Gateway**. SSH access to the EC2 instance is working normally."
+
+Known Information:
+
+* EC2 Instance is Running.
+* Public IP Address is correct.
+* Security Group allows HTTP (Port 80).
+* Internet Gateway is correctly attached.
+* Route Table is correctly configured.
+* SSH connectivity is successful.
+
+This indicates that the AWS infrastructure and networking are functioning correctly.
+
+---
+
+# What is a 502 Bad Gateway?
+
+According to web server architecture, a **502 Bad Gateway** response is returned when a reverse proxy server (such as Nginx) receives an invalid response or no response from the backend application server.
+
+A typical application architecture is:
+
+```text
+Client Browser
+        │
+        ▼
+     Nginx
+        │
+        ▼
+Backend Application
+(Flask / FastAPI / Django)
+```
+
+Nginx forwards client requests to the backend application. If the backend is unavailable, crashed, or responding incorrectly, Nginx returns **HTTP 502 Bad Gateway**.
+
+---
+
+# Troubleshooting Approach
+
+Instead of guessing or restarting services immediately, a Cloud Engineer should eliminate possible causes one by one.
+
+### Step 1 – Eliminate Infrastructure Issues
+
+Verified:
+
+* EC2 instance is running.
+* Public IP is correct.
+* Security Group permits HTTP traffic.
+* Internet Gateway is attached.
+* Route Table is configured.
+* SSH connection is successful.
+
+Conclusion:
+
+The problem is unlikely to be related to AWS infrastructure.
+
+---
+
+### Step 2 – Investigate the Web Server
+
+Check the Nginx service:
+
+```bash
+sudo systemctl status nginx
+```
+
+Purpose:
+
+* Verify whether Nginx is running.
+* Check if the service has failed.
+* Confirm there are no startup errors.
+
+---
+
+### Step 3 – Verify Backend Application
+
+If Nginx is running correctly but users still receive a **502 Bad Gateway**, the backend application should be investigated.
+
+Possible causes include:
+
+* Backend application crashed.
+* Deployment failed.
+* Application contains code errors.
+* Wrong application port.
+* Reverse proxy configuration mismatch.
+* Application dependencies are missing.
+* Backend service is not listening for requests.
+
+---
+
+### Step 4 – Verify Backend Process
+
+Useful commands:
+
+```bash
+ps aux
+```
+
+Displays all running processes.
+
+```bash
+sudo ss -tuln
+```
+
+Displays listening ports.
+
+Purpose:
+
+To confirm whether the backend application is running and listening on the expected port.
+
+---
+
+### Step 5 – Investigate Logs Before Restarting
+
+A Cloud Engineer should **never restart services immediately** without first checking logs.
+
+Possible commands:
+
+```bash
+sudo journalctl -xe
+```
+
+or
+
+```bash
+sudo tail -20 /var/log/nginx/error.log
+```
+
+Purpose:
+
+Logs help identify the root cause before any corrective action is taken.
+
+Examples of issues revealed by logs:
+
+* Module not found
+* Database connection failure
+* Port already in use
+* Permission denied
+* Application startup failure
+
+---
+
+### Step 6 – Restart Services (Only After Investigation)
+
+If the root cause has been identified and resolved, restart the affected service.
+
+Example:
+
+```bash
+sudo systemctl restart nginx
+```
+
+If the backend service is managed separately:
+
+```bash
+sudo systemctl restart <application-service>
+```
+
+---
+
+# Commands Learned
+
+```bash
+sudo systemctl status nginx
+
+sudo systemctl restart nginx
+
+ps aux
+
+sudo ss -tuln
+
+sudo journalctl -xe
+
+sudo tail -20 /var/log/nginx/error.log
+```
+
+---
+
+# Important Concepts Learned
+
+## Reverse Proxy
+
+A reverse proxy receives client requests and forwards them to backend servers.
+
+Nginx commonly acts as a reverse proxy for:
+
+* Flask
+* FastAPI
+* Django
+* Node.js
+
+---
+
+## Backend Application
+
+The backend application performs the actual business logic.
+
+Examples:
+
+* Flask
+* FastAPI
+* Django
+
+Nginx does not execute Python code; it forwards requests to the backend.
+
+---
+
+## HTTP 502 Bad Gateway
+
+Occurs when:
+
+* Backend application crashes.
+* Backend is unreachable.
+* Incorrect reverse proxy configuration.
+* Backend service is not running.
+* Wrong port configuration.
+
+---
+
+# Troubleshooting Flow
+
+```text
+User reports Website Down
+
+        │
+        ▼
+Is EC2 Running?
+
+        │
+      Yes
+        │
+        ▼
+Can SSH connect?
+
+        │
+      Yes
+        │
+        ▼
+Check Nginx Status
+
+        │
+        ▼
+Nginx Running?
+
+        │
+      Yes
+        │
+        ▼
+Check Backend Application
+
+        │
+        ▼
+Application Running?
+
+        │
+        ▼
+Check Logs
+
+        │
+        ▼
+Identify Root Cause
+
+        │
+        ▼
+Fix Issue
+
+        │
+        ▼
+Restart Service (if required)
+
+        │
+        ▼
+Verify Website
+```
+
+---
+
+# Key Learning
+
+Today's most important lesson was **thinking before acting**.
+
+Instead of immediately restarting services, a Cloud Engineer should:
+
+1. Eliminate infrastructure issues.
+2. Verify the web server.
+3. Investigate the backend application.
+4. Examine logs.
+5. Identify the root cause.
+6. Apply the appropriate fix.
+
+This systematic approach minimizes downtime and avoids masking the original problem.
+
+---
+
+# Interview Questions
+
+### 1. What does HTTP 502 Bad Gateway mean?
+
+It indicates that a reverse proxy server (such as Nginx) did not receive a valid response from the backend application server.
+
+---
+
+### 2. If SSH works but the website is inaccessible, what should you check next?
+
+The web server (Nginx), backend application, and application logs.
+
+---
+
+### 3. Why should you check logs before restarting services?
+
+Logs preserve the evidence of the failure and help identify the root cause. Restarting too early may remove useful diagnostic information.
+
+---
+
+### 4. Can Nginx return a 502 error even if Nginx itself is running?
+
+Yes. If the backend application is unavailable or not responding correctly, Nginx can still return a 502 Bad Gateway error.
+
+---
+
+### 5. What is the role of Nginx in a web application architecture?
+
+Nginx acts as a reverse proxy, receiving client requests and forwarding them to the backend application server.
+
+---
+
+# Day 17 Outcome
+
+By completing Day 17, I learned to approach production incidents like a Cloud Engineer rather than simply following commands. I practiced identifying infrastructure versus application issues, understood how reverse proxies interact with backend services, and learned the importance of evidence-based troubleshooting through log analysis before taking corrective actions. This incident-driven approach strengthens the practical skills required to manage real-world cloud environments.
